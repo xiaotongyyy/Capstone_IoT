@@ -12,5 +12,6 @@ public interface DeviceRepository extends JpaRepository<Device, Long> {
     List<Device> findAllByOrderByIdAsc();
 
     Device findTopById(Long id);
+    Device findTopByTypeIs(String type);
 
 }

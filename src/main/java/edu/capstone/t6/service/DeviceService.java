@@ -60,16 +60,36 @@ public class DeviceService {
 
     @Transactional
     public void turnOff(Long id) {
-        /* Retrieve timestamp and calculate running time */
-        Log lastLog = logRepo.findTopByRunStatAndDevice_Id(Boolean.TRUE, id);
-        Long runTime = (System.currentTimeMillis() - lastLog.getTimestamp().getTime())/1000;
-        /* Change runStat to turned off */
-        logRepo.updateRunStatById(id, Boolean.FALSE);
-        /* Check out */
         Device d = devRepo.findTopById(id);
-        Map<String,Double> usage = calc.calculate(d.getType(), d.getPower(), d.getWater(), runTime);
+        Map<String, Double> usage;
+        if (d.getType().equals("Bath") || d.getType().equals("Shower")
+                || d.getType().equals("DishWasher") || d.getType().equals("ClothWasher")
+                || d.getType().equals("Dryer") || d.getType().equals("Refrigerator")) {
+            usage = calc.calculate(d.getType(), d.getPower(), d.getWater(), Long.valueOf(0));
+
+        } else {
+            /* Retrieve timestamp and calculate running time */
+            Log lastLog = logRepo.findTopByRunStatAndDevice_Id(Boolean.TRUE, id);
+            Long runTime = (System.currentTimeMillis() - lastLog.getTimestamp().getTime()) / 1000;
+            /* Change runStat to turned off */
+            logRepo.updateRunStatById(id, Boolean.FALSE);
+            /* Check out */
+            usage = calc.calculate(d.getType(), d.getPower(), d.getWater(), runTime);
+        }
+        double hotfix = usage.get("water") * usage.get("ratio");
         /* Update usage record */
         Date da = new Date(System.currentTimeMillis());
-        usageRepo.updateUsageByDate(usage.get("power"),usage.get("water"), da);
+        usageRepo.updateUsageByDate(usage.get("power"), usage.get("water"), da);
+        if(hotfix != 0) {
+            heater(hotfix);
+        }
+    }
+
+    public void heater(double hotfix) {
+        Device d = devRepo.findTopByTypeIs("WaterHeater");
+        double usage = calc.heater(d.getPower(), hotfix);
+        /* Update usage record */
+        Date da = new Date(System.currentTimeMillis());
+        usageRepo.updateUsageByDate(usage, 0.0, da);
     }
 }
