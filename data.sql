@@ -1,0 +1,1 @@
+INSERT INTO usage(date, power, water) values('2019-03-20', 0, 0);
