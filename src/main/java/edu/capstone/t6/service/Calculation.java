@@ -13,16 +13,11 @@ public class Calculation {
         double powerUsed = 0.0;
         double waterUsed = 0.0;
         Map res = new HashMap();
-        System.out.println(devType);
-
         switch(devType) {
             case "Bulb" :
-                System.out.println("Bulb");
                 powerUsed = this.generalPowEq(ratedPower, runTime);
                 break;
-
         }
-        System.out.println("powerUsed");
         res.put("power", powerUsed);
         res.put("water", waterUsed);
         return res;

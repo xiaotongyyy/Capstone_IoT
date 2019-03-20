@@ -70,9 +70,6 @@ public class DeviceService {
         Map<String,Double> usage = calc.calculate(d.getType(), d.getPower(), d.getWater(), runTime);
         /* Update usage record */
         Date da = new Date(System.currentTimeMillis());
-        System.out.println(da);
-        System.out.println(usage.get("power"));
-        System.out.println(usage.get("water"));
         usageRepo.updateUsageByDate(usage.get("power"),usage.get("water"), da);
     }
 }
